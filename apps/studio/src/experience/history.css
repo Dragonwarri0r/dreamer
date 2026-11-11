@@ -1,0 +1,17 @@
+.experience-history-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+.experience-history-heading h2{margin:0}
+.experience-history-section{border-top:1px solid var(--border);margin-top:16px;min-width:0}
+.experience-history-section>summary{cursor:pointer;padding:14px 0;line-height:1.6;font-size:14px}
+.experience-history-section-body{padding-bottom:4px}
+.experience-history-section-body>p:first-child{margin-top:0}
+.experience-history-decisions .experience-trace{border:0;padding:0 0 8px}
+.experience-export-status{display:inline-block;margin-left:12px;font-size:12px;color:var(--muted)}
+.experience-export-status.needs-attention{color:#e8b67f}
+.experience-history-source{border-top:1px solid var(--border);margin-top:14px;padding-top:6px}
+.experience-history-source>summary{cursor:pointer;padding:8px 0;color:var(--muted);line-height:1.5}
+.experience-history-source .button{display:inline-block}
+.experience-history .job-card{min-width:0;overflow-wrap:anywhere}
+.experience-history .job-card .actions:empty{display:none}
+@container editor (min-width:701px){.experience-editor .experience-history-player video{height:clamp(180px,calc(100dvh - 650px),500px);object-fit:contain}}
+@container editor (max-width:700px){.experience-history-heading button,.experience-history .actions button,.experience-history .button{min-height:42px;box-sizing:border-box}.experience-history .actions{gap:8px}.experience-history-source .button{line-height:24px}}
+.experience-history{border-color:var(--border)}

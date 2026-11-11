@@ -1,0 +1,5 @@
+{
+  "h3-preview/v1": {"width":320,"height":576,"frames":124,"fps":24,"steps":4,"turbo":true,"final":false},
+  "h3-turbo/v1": {"width":480,"height":832,"frames":124,"fps":24,"steps":4,"turbo":true,"final":false},
+  "h3-quality/v1": {"width":480,"height":832,"frames":124,"fps":24,"steps":16,"turbo":false,"final":true}
+}

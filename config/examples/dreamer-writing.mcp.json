@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "dreamer-writing": {
+      "command": "/bin/sh",
+      "args": ["/absolute/path/to/dreamer/scripts/dreamer-writing-mcp.sh"],
+      "env": {
+        "DREAMER_URL": "http://127.0.0.1:4327",
+        "DREAMER_NODE_BIN": "/absolute/path/to/node",
+        "DREAMER_WRITING_CLIENT_ID": "dreamer-author"
+      }
+    }
+  }
+}

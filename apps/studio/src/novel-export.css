@@ -1,0 +1,15 @@
+.novel-export {min-width:0;margin:16px 0;padding:14px;border:1px solid var(--border,#d4d4d4);border-radius:10px;}
+.novel-export-controls {display:flex;flex-wrap:wrap;align-items:center;gap:10px;}
+.novel-export-controls>label {display:flex;align-items:center;gap:6px;min-width:0;}
+.novel-export-controls select {max-width:100%;}
+.novel-export-limit input {width:90px;}
+.novel-export button {display:inline-flex;align-items:center;justify-content:center;gap:6px;flex-shrink:0;}
+.novel-export p {font-size:12px;line-height:1.6;margin:8px 0 0;}
+.novel-export-result {min-width:0;margin-top:12px;}
+.novel-export-result summary {font-size:13px;line-height:1.6;cursor:pointer;overflow-wrap:anywhere;}
+.novel-export-path {display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.novel-export-path input {flex:1 1 220px;min-width:0;width:100%;font-size:12px;}
+.novel-export-result ul {padding:0;list-style:none;max-height:260px;overflow:auto;}
+.novel-export-result li {display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px;padding:6px 0;}
+.novel-export-result a {overflow-wrap:anywhere;min-width:0;}
+.novel-export-result small {color:var(--muted,#71717a);}

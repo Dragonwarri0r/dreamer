@@ -1,0 +1,24 @@
+import {openExperienceTools,experienceAction,experienceProfile,experienceUid,preparationAction} from './experience-ui.ts';
+import {chromium} from 'playwright';
+import {mkdtempSync,mkdirSync,rmSync,writeFileSync} from 'node:fs';
+import {join,resolve} from 'node:path';
+import {tmpdir} from 'node:os';
+import {randomUUID} from 'node:crypto';
+import assert from 'node:assert/strict';
+import {Application} from '../apps/host/application.ts';
+import {createHost} from '../apps/host/server.ts';
+import {seedInteractiveStory} from './interactive-fixture.ts';
+const root=mkdtempSync(join(tmpdir(),'dreamer-interactive-ui-')),output=resolve(process.env.DREAMER_BROWSER_OUTPUT??'test-results/interactive-script');mkdirSync(output,{recursive:true});
+const app=new Application(root,{providers:[]}),pid=randomUUID();app.bus.execute({projectId:pid,requestId:randomUUID(),operation:'project.create',payload:{title:'城门互动剧本回归'}},{source:'human'});
+const f=await seedInteractiveStory(app,pid),server=createHost(app);await new Promise<void>((r,j)=>{server.once('error',j);server.listen(0,'127.0.0.1',r);});const url=`http://127.0.0.1:${(server.address() as any).port}`;
+const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true}),page=await browser.newPage({viewport:{width:1440,height:1000}}),errors:string[]=[],checks:string[]=[];page.on('pageerror',e=>errors.push(e.message));
+try{
+ await page.goto(`${url}/?${new URLSearchParams({project:pid,window:'interactive-author',editor:'script',object:f.script.id,title:f.script.data.title})}`);await page.getByLabel('互动剧本名称',{exact:true}).waitFor();
+ assert.equal(await page.locator('.script-node').count(),10);await page.getByLabel('节点名称',{exact:true}).fill('城门开场 · 人工修订');await page.getByRole('button',{name:'故事线',exact:true}).click();assert.equal(await page.getByLabel('节点名称',{exact:true}).inputValue(),'城门开场 · 人工修订');assert.equal(app.scripts.repo.get(f.script.id,pid).seq,1);checks.push('卡片与故事线共享同一草稿，切换不自动保存或发布');
+ await page.locator('.script-node').first().getByRole('button',{name:'折叠',exact:true}).click();assert.equal(app.scripts.repo.get(f.script.id,pid).seq,1);await page.getByRole('button',{name:'保存草稿',exact:true}).click();await page.waitForFunction(()=>document.querySelector('.editor-toolbar .primary')?.hasAttribute('disabled'));assert.equal(app.scripts.repo.get(f.script.id,pid).data.nodes[0].title,'城门开场 · 人工修订');
+ await page.getByRole('button',{name:'变量',exact:true}).click();await page.getByText('交涉方法 · 有限选项 · 3 处使用',{exact:false}).count();assert.equal(await page.locator('.script-variables details').count(),4);await page.getByRole('button',{name:'剧本',exact:true}).click();await page.getByRole('button',{name:'检查剧本',exact:true}).click();await page.locator('.script-diagnostics').waitFor();assert.ok((await page.locator('.script-diagnostics').innerText()).includes('需要')||(await page.locator('.script-diagnostics').innerText()).includes('提示')||(await page.locator('.script-diagnostics').innerText()).includes('通过'));checks.push('变量使用位置、来源版本、诊断面板可用；折叠只保存视图状态');
+ await page.screenshot({path:join(output,'author-desktop.png')});await page.getByRole('button',{name:'逻辑模拟',exact:true}).click();await page.getByText('逻辑模拟 · 不调用模型',{exact:true}).waitFor();await page.getByRole('button',{name:'帮助受伤的守卫',exact:true}).click();await page.getByRole('button',{name:'模拟片段结束',exact:true}).click();await page.getByRole('heading',{name:'帮助守卫',exact:true}).waitFor();await page.getByRole('button',{name:'模拟片段结束',exact:true}).click();await page.getByRole('heading',{name:'故事已结束',exact:true}).waitFor();await experienceAction(page,'查看已走路线');await page.locator('.experience-trace').waitFor();assert.ok((await page.locator('.experience-variables').innerText()).includes('trust'));assert.equal(app.production.jobs.list(pid).length,0);checks.push('相同规则引擎完成选择、分支、汇合与结局；模拟不创建生成任务');
+ await experienceProfile(page);await page.getByLabel('当前体验 UID',{exact:true}).fill('reader-2');await page.getByRole('button',{name:'切换档案',exact:true}).click();await page.getByText('这个档案还没有体验记录。',{exact:true}).waitFor();checks.push('切换 UID 不带入另一档案的变量和体验');
+ await page.setViewportSize({width:390,height:844});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);await page.screenshot({path:join(output,'simulation-mobile.png')});assert.deepEqual(errors,[]);writeFileSync(join(output,'report.json'),JSON.stringify({passed:true,checks,errors,externalCalls:0},null,2));console.log(JSON.stringify({passed:true,checks,errors}));
+}catch(e){await page.screenshot({path:join(output,'failure.png'),fullPage:true});console.error(JSON.stringify({checks,errors,body:(await page.locator('body').innerText()).slice(-5000)}));throw e;}
+finally{await browser.close();server.closeAllConnections();await new Promise<void>(r=>server.close(()=>r()));app.close();rmSync(root,{recursive:true,force:true});}

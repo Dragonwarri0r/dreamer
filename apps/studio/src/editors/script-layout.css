@@ -1,0 +1,41 @@
+/* Keep secondary authoring tools available without competing with the script. */
+.interactive-script .script-disclosure{margin:12px 0;padding:0;border:1px solid var(--border);border-radius:10px;background:var(--panel);min-width:0;overflow-wrap:anywhere}
+.interactive-script .script-disclosure>summary{padding:14px 16px;cursor:pointer;font-weight:600;line-height:1.45;list-style-position:inside}
+.interactive-script .script-disclosure>summary>span{display:block;margin:4px 0 0 18px;color:var(--muted);font-size:12px;font-weight:400}
+.interactive-script .script-disclosure[open]{padding:0 16px 16px}
+.interactive-script .script-disclosure[open]>summary{margin:0 -16px 12px;border-bottom:1px solid var(--border)}
+.interactive-script .script-add-node .script-insert{border:0;margin:0;padding:0}
+.interactive-script .script-node-management{margin-top:20px;background:transparent}
+.interactive-script .script-node-management .send-to-agent{margin-bottom:0}
+.interactive-script .script-production{max-width:960px;margin-top:22px}
+.interactive-script .script-production-heading h2{margin-bottom:6px}
+.interactive-script .script-production-heading p{margin-top:0}
+.interactive-script .script-publish-card{border:1px solid var(--border);background:var(--panel);border-radius:14px;padding:20px;margin:18px 0}
+.interactive-script .script-publish-card h3{margin-top:0}
+.interactive-script .script-readiness{display:flex;flex-wrap:wrap;gap:8px 16px;color:var(--muted);font-size:13px;margin-bottom:14px}
+.interactive-script .script-production .actions,.interactive-script .script-node-management .actions{flex-wrap:wrap;gap:8px}
+.interactive-script .script-execution-profile{min-width:0;border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:20px}
+.interactive-script .script-instance-review{min-width:0}
+.interactive-script .script-review-attention{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin:14px 0;padding:12px}
+.interactive-script .script-review-attention strong{font-size:13px}
+.interactive-script .script-instance-review fieldset{min-width:0;margin-top:14px;border:1px solid var(--border);border-radius:8px}
+.interactive-script .script-instance-review details:not(.script-disclosure){margin:14px 0}
+.interactive-script .script-instance-review details:not(.script-disclosure)>summary{cursor:pointer;color:var(--muted)}
+.interactive-script .script-release{align-items:flex-start;gap:12px}
+.interactive-script .script-release>span{flex:1;min-width:160px;overflow-wrap:anywhere}
+.interactive-script .script-release button{white-space:normal}
+.interactive-script .script-properties .generation-contract{margin:16px 0}
+.interactive-script .script-properties details>summary{cursor:pointer;line-height:1.5}
+.interactive-script .script-production button,.interactive-script .script-properties button{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.interactive-script .script-production input,.interactive-script .script-production select,.interactive-script .script-production textarea{max-width:100%;min-width:0;box-sizing:border-box}
+@media(max-width:600px){
+ .interactive-script .script-publish-card{padding:14px}
+ .interactive-script .script-disclosure>summary{padding:12px}
+ .interactive-script .script-disclosure[open]{padding:0 12px 12px}
+ .interactive-script .script-disclosure[open]>summary{margin:0 -12px 12px}
+ .interactive-script .script-production .actions{align-items:stretch}
+ .interactive-script .script-production .actions>button{flex:1 1 140px}
+ .interactive-script .script-release>span{min-width:0;flex-basis:100%}
+ .interactive-script .script-production .form-grid{grid-template-columns:minmax(0,1fr)}
+}
+.interactive-script .script-authorization-summary{font-size:12px;color:var(--muted);line-height:1.6;overflow-wrap:anywhere;margin:14px 0 10px}

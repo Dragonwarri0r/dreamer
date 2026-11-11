@@ -1,0 +1,14 @@
+import { resolve } from 'node:path';
+import { RestrictedRuntimeGenerator } from '../../packages/infra/agent/runtime-generator.ts';
+import { LocalRuntimeGenerator } from '../../packages/infra/agent/local-runtime-generator.ts';
+import { Application } from './application.ts';
+import { createHost } from './server.ts';
+const root=resolve(process.env.DREAMER_DATA_ROOT??'data/workspace');
+const port=Number(process.env.DREAMER_PORT??4327);
+if(!Number.isInteger(port)||port<1||port>65535)throw new Error('DREAMER_PORT 无效');
+const runtimeText=process.env.DREAMER_RUNTIME_TEXT??'disabled';
+if(!['disabled','local','codex'].includes(runtimeText))throw new Error('Invalid DREAMER_RUNTIME_TEXT: use disabled, local or explicit codex');
+const runtimeGenerator=runtimeText==='local'?new LocalRuntimeGenerator(root,{baseUrl:process.env.DREAMER_RUNTIME_TEXT_URL??'http://127.0.0.1:1234/v1',model:process.env.DREAMER_RUNTIME_TEXT_MODEL??''}):runtimeText==='codex'?new RestrictedRuntimeGenerator(root):undefined;
+const app=new Application(root,{runtimeGenerator}), server=createHost(app);
+server.listen(port,'127.0.0.1',()=>console.log(`Dreamer http://127.0.0.1:${port} · 数据 ${root}`));
+let stopping=false;for(const signal of ['SIGINT','SIGTERM'] as const)process.on(signal,()=>{if(stopping)return;stopping=true;server.close(()=>{app.close();process.exit(0);});});

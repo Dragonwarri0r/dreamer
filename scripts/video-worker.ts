@@ -1,0 +1,4 @@
+import {spawn} from 'node:child_process';import {existsSync} from 'node:fs';import {resolve} from 'node:path';
+const python=process.env.DREAMER_VIDEO_PYTHON??resolve('../short-dreamer/.local/video-venv/bin/python');const manifest=process.env.DREAMER_MODEL_MANIFEST??resolve('../short-dreamer/.local/video-models.json');
+if(!existsSync(python)||!existsSync(manifest))throw new Error('请配置 DREAMER_VIDEO_PYTHON 与 DREAMER_MODEL_MANIFEST；不自动下载模型或改变推理环境');
+const child=spawn(python,['workers/video/worker.py'],{stdio:'inherit',env:{...process.env,DREAMER_MODEL_MANIFEST:manifest,DREAMER_VIDEO_DATA:resolve(process.env.DREAMER_VIDEO_DATA??'.local/video-worker'),PYTHONDONTWRITEBYTECODE:'1'},shell:false});for(const signal of ['SIGINT','SIGTERM'] as const)process.on(signal,()=>child.kill(signal));child.on('exit',code=>process.exitCode=code??1);

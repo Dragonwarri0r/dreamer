@@ -1,0 +1,23 @@
+title = "Dreamer source and history scan"
+
+[extend]
+useDefault = true
+
+# Keep every default detector. Only these reviewed non-secret values are excluded,
+# and only in the exact source files where they have their documented meaning.
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Deterministic MCP request identity, not an authentication credential"
+condition = "AND"
+regexTarget = "secret"
+paths = ['''(^|/)tests/03-writing-mcp\.test\.ts$''']
+regexes = ['''^chapter-seven-discuss-1$''']
+
+[[rules.allowlists]]
+description = "Name of the environment variable passed to the local MLX server"
+condition = "AND"
+regexTarget = "secret"
+paths = ['''(^|/)workers/h3/run\.py$''']
+regexes = ['''^DREAMER_H3_PRIVATE_KEY$''']

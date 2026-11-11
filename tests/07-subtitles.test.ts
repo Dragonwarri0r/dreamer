@@ -1,0 +1,13 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {randomUUID} from 'node:crypto';import {join,resolve} from 'node:path';import {readFileSync,copyFileSync,mkdirSync} from 'node:fs';import {fixture,until} from './helpers.ts';import {execute,mediaBinary} from '../packages/infra/media.ts';import {wrapSubtitle,subtitleStyle} from '../packages/infra/subtitles.ts';
+test('07 长中文对白在竖屏实际合成后保持可见边距，结束帧后不显示',async()=>{
+ const x=fixture();try{
+  const width=240,height=416,p=x.app.projects.repo.get(x.pid,x.pid);x.run('project.update',{id:x.pid,expectedSeq:p.seq,data:{...p.data,width,height}});
+  x.run('shot.create',{title:'画面',durationFrames:24});let cut=x.run('cut.fromBoard',{title:'竖屏字幕'});
+  cut=x.run('cut.update',{id:cut.id,expectedSeq:cut.seq,data:{...cut.data,cues:[{id:randomUUID(),startFrame:0,endFrame:12,text:'我能读懂前后的意思。全能之路，开始！可我们要的，是一座真正能够走过去的桥。'}]}});
+  const b=x.run('build.create',{id:cut.id,expectedSeq:cut.seq,title:'字幕边距'}),rendering=x.run('build.render',{id:b.id,expectedSeq:b.seq}),j=await until(()=>x.app.production.jobs.get(rendering.data.jobId,x.pid),j=>['completed','failed','unknown'].includes(j.data.state),30000);assert.equal(j.data.state,'completed',j.data.error);
+  const a=x.app.production.artifacts.at(j.data.artifact!,x.pid),bounds=[];assert.equal(a.data.width,width);assert.equal(a.data.height,height);const out=resolve('test-results/subtitles');mkdirSync(out,{recursive:true});copyFileSync(x.app.production.files.path(a.data.sha256),join(out,'portrait.mp4'));
+  for(const time of [.25,.75]){const frame=join(x.root,`frame-${time}.raw`);await execute(mediaBinary('ffmpeg'),['-y','-v','error','-ss',String(time),'-i',x.app.production.files.path(a.data.sha256),'-frames:v','1','-pix_fmt','gray','-f','rawvideo',frame]);const bytes=readFileSync(frame),points=[];assert.equal(bytes.length,width*height);copyFileSync(frame,join(out,`frame-${time}.raw`));for(let y=Math.floor(height*.65);y<height;y++)for(let xx=0;xx<width;xx++)if(bytes[y*width+xx]>100)points.push({x:xx,y});bounds.push(points);}
+  assert.ok(bounds[0].length>100,`字幕实际可见，当前亮像素 ${bounds[0].length}`);assert.equal(bounds[1].length,0,'字幕结束后消失');const xs=bounds[0].map(p=>p.x),ys=bounds[0].map(p=>p.y);assert.ok(Math.min(...xs)>=10&&Math.max(...xs)<=width-10,'左右没有裁切');assert.ok(Math.max(...ys)-Math.min(...ys)>25,'中文对白分为多行');assert.ok(Math.max(...ys)<=height-15,'底部留白');
+ }finally{x.close();}
+});
+test('07 自动换行保留中文与完整 emoji，不把长词推到画面之外',()=>{const text='读懂上下文👨‍👩‍👧‍👦，把事情办好。';assert.equal(wrapSubtitle(text,6).replaceAll('\n',''),text);const style=subtitleStyle(480,832);assert.ok(style.fontSize>=18&&style.fontSize<=25);assert.ok(wrapSubtitle('one extremelylongunbrokenword to read',10).split('\n').every(s=>s.length<=10));});

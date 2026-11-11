@@ -1,0 +1,24 @@
+Dreamer
+Copyright 2026 Dreamer contributors
+
+This project is licensed under the Apache License, Version 2.0.
+
+Writing-method adaptations reference these projects:
+- CLINLX / write-novel-skill (MIT)
+- 0xsline / short-drama (MIT)
+- eternityspring / shuohao-skills (Apache-2.0)
+- karthikv792 / kv-skills (MIT)
+
+Dreamer rewrites and combines these methods into its own runtime instructions,
+versioned writing skills, fixed-content references and proposal-review workflow.
+The original license texts and copyright notices are retained in docs/licenses/.
+The original shuohao-skills NOTICE is retained in docs/licenses/shuohao-NOTICE.txt;
+its reference to its bundled sample story describes that upstream distribution.
+That sample story is not included in Dreamer.
+
+The LTX/H3 adapters reuse local short-dreamer implementation work, with source
+provenance recorded in workers/video/README.md and workers/h3/README.md.
+External inference runtimes, model weights, FFmpeg executables and npm packages
+are not bundled in this source repository. Their licenses apply separately.
+
+See THIRD_PARTY_NOTICES.md and docs/licenses/README.md for the source inventory.

@@ -1,0 +1,18 @@
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {z} from 'zod';
+import {schemaRegistry} from '../packages/core/schema-registry.ts';
+import {ScriptPlanData,ScriptOperation} from '../packages/contracts/interactive-script.ts';
+import {ScriptRelease,RuntimeStart,RuntimeCommand,PositionSave,RuntimeResponse,RuntimeView,SegmentScriptV1,InstanceCueBinding,InstanceFallback,RuntimeContentRef,RuntimeTraceQuery,RuntimeTracePage} from '../packages/contracts/experience.ts';
+import {InstanceProposal,RuntimeAdoptionSource} from '../packages/contracts/adoption.ts';
+import {ExperiencedHistory,ExperienceExportPlan,ExperienceExportRequest,ExperienceExportRetry,ExperienceExport} from '../packages/contracts/experience-export.ts';
+import {LocalRuntimeDraftV1} from '../packages/contracts/local-runtime-draft.ts';
+import {ExperienceCatalog,ExperienceCatalogQuery} from '../packages/contracts/experience-catalog.ts';
+import {WritingStartRequest,WritingContinueRequest,WritingReceiptRequest,WritingStatusQuery,WritingOffer,WritingTurn} from '../packages/contracts/writing.ts';
+const registry=schemaRegistry();
+mkdirSync('docs/contracts',{recursive:true});
+writeFileSync('docs/contracts/commands.schema.json',JSON.stringify(registry.schemas(),null,2)+'\n');
+const schemas={ExperienceCatalog,ExperienceCatalogQuery,ScriptPlanData,ScriptOperation,ScriptRelease,RuntimeStart,RuntimeCommand,PositionSave,RuntimeResponse,RuntimeView,SegmentScriptV1,LocalRuntimeDraftV1,InstanceCueBinding,InstanceFallback,RuntimeContentRef,RuntimeTraceQuery,RuntimeTracePage,InstanceProposal,RuntimeAdoptionSource,ExperiencedHistory,ExperienceExportPlan,ExperienceExportRequest,ExperienceExportRetry,ExperienceExport};
+writeFileSync('docs/contracts/interactive-script.schema.json',JSON.stringify(Object.fromEntries(Object.entries(schemas).map(([key,schema])=>[key,z.toJSONSchema(schema,{reused:'ref'})])),null,2)+'\n');
+const writingSchemas={WritingStartRequest,WritingContinueRequest,WritingReceiptRequest,WritingStatusQuery,WritingOffer,WritingTurn};
+writeFileSync('docs/contracts/writing.schema.json',JSON.stringify(Object.fromEntries(Object.entries(writingSchemas).map(([key,schema])=>[key,z.toJSONSchema(schema,{reused:'ref'})])),null,2)+'\n');
+console.log(`${registry.operations().length} 个作者命令和 ${Object.keys(schemas).length} 个互动协议已导出；没有启动 Host、Provider 或恢复任务`);

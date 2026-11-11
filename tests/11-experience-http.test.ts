@@ -1,0 +1,86 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { createHash, randomUUID } from 'node:crypto';
+import { Application } from '../apps/host/application.ts';
+import { createHost } from '../apps/host/server.ts';
+import { ArtifactData } from '../packages/contracts/production.ts';
+import { BuildData, CutData } from '../packages/contracts/editorial.ts';
+import { SceneData } from '../packages/contracts/creative.ts';
+import { ScriptPlanData } from '../packages/contracts/interactive-script.ts';
+
+test('11 HTTP 体验沿用会话与CSRF，uid隔离，固定媒体保留Range且不能绕过binding', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'dreamer-experience-http-')), app = new Application(root, { providers: [], recover: false }), server = createHost(app);
+  try {
+    const pid = randomUUID();
+    app.bus.execute({ requestId: randomUUID(), projectId: pid, operation: 'project.create', payload: { title: 'HTTP体验' } }, { source: 'human' });
+    const bytes = Buffer.from('0123456789abcdef'), sha256 = createHash('sha256').update(bytes).digest('hex');
+    writeFileSync(join(root, 'objects', sha256), bytes);
+    const artifact = app.production.artifacts.create(pid, ArtifactData.parse({ title: '固定视频', sha256, sizeBytes: bytes.length, mediaType: 'video/mp4', durationSeconds: 10, fps: 24, source: 'fixture', createdAt: new Date().toISOString() }));
+    const artifactRef = app.production.artifacts.checkpoint(artifact.id, pid, artifact.seq);
+    const cutData = CutData.parse({ title: '固定成片', tracks: [{ id: randomUUID(), title: '画面', type: 'video' }] });
+    const cut = app.editorial.repo.create(pid, cutData), cutRef = app.editorial.repo.checkpoint(cut.id, pid, cut.seq);
+    const projectRef = app.projects.repo.checkpoint(pid, pid, app.projects.repo.get(pid, pid).seq);
+    const build = app.editorial.builds.create(pid, BuildData.parse({ title: '固定成片', cut: cutRef, project: projectRef, snapshot: cutData, artifacts: [artifactRef], range: { startFrame: 0, endFrame: 240 }, encoding: {}, createdAt: new Date().toISOString(), state: 'completed', output: artifactRef }));
+    const buildRef = app.editorial.builds.checkpoint(build.id, pid, build.seq), segment = randomUUID(), ending = randomUUID();
+    const scene = app.story.repo.create(pid, SceneData.parse({ title: '片段来源' })), sceneRef = app.story.repo.checkpoint(scene.id, pid, scene.seq);
+    const script = app.scripts.repo.create(pid, ScriptPlanData.parse({ schemaVersion: 1, title: '播放', chapterRefs: [], entryNodeId: segment,
+      nodes: [{ id: segment, type: 'segment', title: '片段', outlineOrder: 0, mode: 'fixed', sourceSceneRefs: [sceneRef], contentSpec: { mode: 'fixed', media: { buildRef, fromFrame: 0, toFrame: 240, fps: 24, contentHash: sha256 } }, next: ending },
+        { id: ending, type: 'ending', title: '完成', outlineOrder: 1, endingKey: 'normal', summary: '已完成' }] }));
+    const release = app.store.transaction(() => app.scripts.publish(pid, { id: script.id, expectedSeq: script.seq, kind: 'playback', confirmGeneration: false }));
+    await new Promise<void>((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
+    const base = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
+    assert.equal((await fetch(`${base}/api/experience/runs?projectId=${pid}&uid=a`)).status, 403);
+    assert.equal((await fetch(`${base}/api/experience/catalog?projectId=${pid}`)).status, 403);
+    const session = await fetch(base + '/api/session'), cookie = session.headers.get('set-cookie')!.split(';')[0], { csrf } = await session.json() as any;
+    const headers = { cookie, origin: base, 'content-type': 'application/json', 'x-dreamer-csrf': csrf, 'x-dreamer-uid': 'a' };
+    const catalogResponse = await fetch(`${base}/api/experience/catalog?projectId=${pid}`, { headers: { cookie } });
+    assert.equal(catalogResponse.status, 200); assert.equal(catalogResponse.headers.get('cache-control'), 'no-store');
+    const catalog = await catalogResponse.json() as any;
+    assert.equal(catalog.releases.length, 1); assert.equal(catalog.releases[0].releaseId, release.id); assert.equal(catalog.releases[0].scriptTitle, '播放');
+    assert.equal(catalog.releases[0].scriptId, release.scriptRef.id); assert.equal(catalog.releases[0].scriptVersion, release.scriptRef.seq);
+    assert.equal(catalog.releases[0].mayWaitForPreparation, false); assert.equal(catalog.releases[0].snapshot, undefined);
+    assert.equal((await fetch(`${base}/api/experience/catalog?projectId=${pid}`, { headers: { cookie, origin: 'https://not-this-host.example' } })).status, 403);
+    assert.equal((await fetch(`${base}/api/experience/catalog?projectId=invalid`, { headers: { cookie } })).status, 400);
+    assert.equal((await fetch(`${base}/api/experience/catalog?projectId=${randomUUID()}`, { headers: { cookie } })).status, 404);
+    assert.equal((await fetch(`${base}/api/experience/catalog?projectId=${pid}&limit=101`, { headers: { cookie } })).status, 400);
+    const start = { protocolVersion: 1, requestId: randomUUID(), projectId: pid, releaseId: catalog.releases[0].releaseId, mode: 'playback' };
+    assert.equal((await fetch(base + '/api/experience/start', { method: 'POST', headers: { ...headers, 'x-dreamer-csrf': 'wrong' }, body: JSON.stringify(start) })).status, 403);
+    const response = await fetch(base + '/api/experience/start', { method: 'POST', headers, body: JSON.stringify(start) });
+    assert.equal(response.status, 200);
+    const started = await response.json() as any, view = started.view;
+    const runQuery = `projectId=${pid}&uid=a&runId=${view.run.id}`;
+    assert.equal((await fetch(`${base}/api/experience/run?${runQuery.replace('uid=a', 'uid=b')}`, { headers: { cookie } })).status, 404);
+    assert.equal((await fetch(`${base}/api/experience/export?${runQuery.replace('uid=a', 'uid=b')}`, { headers: { cookie } })).status, 404);
+    const beforeExport = await (await fetch(`${base}/api/experience/export?${runQuery}`, { headers: { cookie } })).json() as any;
+    assert.deepEqual(beforeExport.instances, []);
+    assert.deepEqual(beforeExport.media, []);
+    const otherRuns = await (await fetch(`${base}/api/experience/runs?projectId=${pid}&uid=b`, { headers: { cookie } })).json() as any;
+    assert.deepEqual(otherRuns.runs, []);
+    const binding = view.playback.bindings[0], mediaUrl = `${base}/api/experience/media?${runQuery}&planHash=${view.playback.planHash}&bindingId=${binding.id}`;
+    const range = await fetch(mediaUrl, { headers: { cookie, range: 'bytes=2-5' } });
+    assert.equal(range.status, 206); assert.equal(range.headers.get('content-range'), 'bytes 2-5/16'); assert.equal(await range.text(), '2345');
+    assert.equal((await fetch(mediaUrl.replace(binding.id, artifact.id), { headers: { cookie } })).status, 404);
+    const command = { protocolVersion: 1, requestId: randomUUID(), projectId: pid, runId: view.run.id, expectedStateSeq: view.run.stateSeq, visitId: view.run.currentVisitId, operation: 'segment.complete', payload: { instanceId: view.instance.id, planHash: view.playback.planHash, frame: 240 } };
+    const completed = await (await fetch(base + '/api/experience/commands', { method: 'POST', headers, body: JSON.stringify(command) })).json() as any;
+    assert.equal(completed.view.run.status, 'completed');
+    const afterExport = await (await fetch(`${base}/api/experience/export?${runQuery}`, { headers: { cookie } })).json() as any;
+    assert.deepEqual(afterExport.instances.map((instance: any) => instance.id), [view.instance.id]);
+    assert.equal(afterExport.media.length, 1);
+    const trace = await (await fetch(`${base}/api/experience/trace?${runQuery}&limit=1`, { headers: { cookie } })).json() as any;
+    assert.equal(trace.visits.length, 1); assert.equal(trace.contentPage.total, 2); assert.equal(trace.contentPage.partial, true);
+    const nextTrace = await (await fetch(`${base}/api/experience/trace?${runQuery}&limit=1&cursor=${encodeURIComponent(trace.contentPage.nextCursor)}`, { headers: { cookie } })).json() as any;
+    assert.equal(nextTrace.visits[0].nodeId, ending); assert.equal(nextTrace.contentPage.nextCursor, null);
+    const otherRun = app.experienceRuntime.start({ projectId: pid, uid: 'a' }, { ...start, requestId: randomUUID() } as any).view.run.id;
+    assert.equal((await fetch(`${base}/api/experience/trace?${runQuery.replace(view.run.id, otherRun)}&cursor=${encodeURIComponent(trace.contentPage.nextCursor)}`, { headers: { cookie } })).status, 403);
+    assert.equal((await fetch(`${base}/api/experience/trace?${runQuery}&limit=101`, { headers: { cookie } })).status, 400);
+    const receipt = await (await fetch(base + '/api/experience/receipt', { method: 'POST', headers, body: JSON.stringify(command) })).json() as any;
+    assert.equal(receipt.found, true); assert.equal(receipt.receipt.status, 'completed');
+    const bad = await fetch(base + '/api/experience/commands', { method: 'POST', headers, body: JSON.stringify({ ...command, requestId: randomUUID(), variables: { hacked: true } }) });
+    assert.equal(bad.status, 400);
+  } finally {
+    await new Promise<void>(resolve => server.close(() => resolve())); app.close(); rmSync(root, { recursive: true, force: true });
+  }
+});

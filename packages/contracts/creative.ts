@@ -1,0 +1,11 @@
+import {z} from 'zod';import {Id,Ref} from './foundation.ts';
+export const ScriptBlock=z.strictObject({id:Id,type:z.enum(['action','dialogue','beat']),text:z.string().max(12000),speaker:z.string().max(120).default(''),entityId:Id.optional()});
+export const UseBinding=z.strictObject({ref:Ref,variantId:Id.optional(),purpose:z.string().max(200).default('视觉参考'),localState:z.string().max(3000).default('')});
+export const SceneData=z.strictObject({chapterId:Id.optional(),title:z.string().trim().min(1).max(160),order:z.number().int().min(0).default(0),location:z.string().max(300).default(''),time:z.string().max(300).default(''),synopsis:z.string().max(6000).default(''),blocks:z.array(ScriptBlock).max(500).default([]),bindings:z.array(UseBinding).default([]),storyState:z.string().max(6000).default(''),notes:z.string().max(6000).default(''),branchOf:Ref.optional()});
+export type SceneData=z.infer<typeof SceneData>;
+export const Reference=z.strictObject({artifact:Ref,purpose:z.enum(['appearance','pose','style','location','voice','other']),source:z.string().max(2000).default(''),selected:z.boolean().default(false)});
+export const Variant=z.strictObject({id:Id,title:z.string().min(1).max(160),description:z.string().max(6000),references:z.array(Reference).default([])});
+export const ResourceData=z.strictObject({title:z.string().trim().min(1).max(160),type:z.enum(['character','location','prop','style','voice']),entityId:Id,description:z.string().max(12000).default(''),requirements:z.string().max(6000).default(''),variants:z.array(Variant).default([]),references:z.array(Reference).default([]),notes:z.string().max(6000).default(''),status:z.enum(['needed','draft','published']).default('needed'),branchOf:Ref.optional()});
+export type ResourceData=z.infer<typeof ResourceData>;
+export const KnowledgeData=z.strictObject({title:z.string().trim().min(1).max(160),category:z.enum(['source','inbox','knowledge','bible']).default('inbox'),text:z.string().max(50000).default(''),source:z.string().max(4000).default(''),sourceRef:Ref.optional(),contextRefs:z.array(Ref).default([]),tags:z.array(z.string().max(100)).default([]),confirmed:z.boolean().default(false),branchOf:Ref.optional()});
+export type KnowledgeData=z.infer<typeof KnowledgeData>;

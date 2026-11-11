@@ -1,0 +1,825 @@
+{
+  "WritingStartRequest": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "owner": {
+        "$ref": "#/$defs/__schema0"
+      },
+      "message": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 20000
+      },
+      "mode": {
+        "type": "string",
+        "enum": [
+          "discuss",
+          "draft",
+          "revise",
+          "review"
+        ]
+      },
+      "bindings": {
+        "default": [],
+        "maxItems": 40,
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/__schema1"
+        }
+      },
+      "targetRefs": {
+        "default": [],
+        "maxItems": 40,
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/__schema2"
+        }
+      },
+      "title": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 160
+      },
+      "goal": {
+        "default": "",
+        "type": "string",
+        "maxLength": 20000
+      },
+      "requestId": {
+        "$ref": "#/$defs/__schema0"
+      },
+      "projectId": {
+        "$ref": "#/$defs/__schema0"
+      }
+    },
+    "required": [
+      "owner",
+      "message",
+      "mode",
+      "bindings",
+      "targetRefs",
+      "title",
+      "goal",
+      "requestId",
+      "projectId"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+      "__schema0": {
+        "type": "string",
+        "format": "uuid",
+        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+      },
+      "__schema1": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "$ref": "#/$defs/__schema2"
+          },
+          "purpose": {
+            "default": "参考",
+            "type": "string",
+            "maxLength": 200
+          },
+          "layer": {
+            "default": "turn",
+            "type": "string",
+            "enum": [
+              "project",
+              "work",
+              "thread",
+              "turn"
+            ]
+          },
+          "selection": {
+            "type": "object",
+            "properties": {
+              "blockId": {
+                "$ref": "#/$defs/__schema0"
+              },
+              "field": {
+                "type": "string",
+                "enum": [
+                  "body",
+                  "text"
+                ]
+              },
+              "from": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "to": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "text": {
+                "type": "string",
+                "maxLength": 10000
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "text"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "ref",
+          "purpose",
+          "layer"
+        ],
+        "additionalProperties": false
+      },
+      "__schema2": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "project",
+              "chapter",
+              "episode",
+              "scene",
+              "resource",
+              "knowledge",
+              "shot",
+              "thread",
+              "work",
+              "job",
+              "artifact",
+              "cut",
+              "build",
+              "change",
+              "note",
+              "script"
+            ]
+          },
+          "id": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "seq": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "seq"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "WritingContinueRequest": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "owner": {
+        "$ref": "#/$defs/__schema0"
+      },
+      "message": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 20000
+      },
+      "mode": {
+        "type": "string",
+        "enum": [
+          "discuss",
+          "draft",
+          "revise",
+          "review"
+        ]
+      },
+      "bindings": {
+        "default": [],
+        "maxItems": 40,
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/__schema1"
+        }
+      },
+      "targetRefs": {
+        "default": [],
+        "maxItems": 40,
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/__schema2"
+        }
+      },
+      "threadId": {
+        "$ref": "#/$defs/__schema0"
+      },
+      "selection": {
+        "type": "object",
+        "properties": {
+          "entryId": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "optionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "required": [
+          "entryId",
+          "optionId"
+        ],
+        "additionalProperties": false
+      },
+      "requestId": {
+        "$ref": "#/$defs/__schema0"
+      },
+      "projectId": {
+        "$ref": "#/$defs/__schema0"
+      }
+    },
+    "required": [
+      "owner",
+      "message",
+      "mode",
+      "bindings",
+      "targetRefs",
+      "threadId",
+      "requestId",
+      "projectId"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+      "__schema0": {
+        "type": "string",
+        "format": "uuid",
+        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+      },
+      "__schema1": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "$ref": "#/$defs/__schema2"
+          },
+          "purpose": {
+            "default": "参考",
+            "type": "string",
+            "maxLength": 200
+          },
+          "layer": {
+            "default": "turn",
+            "type": "string",
+            "enum": [
+              "project",
+              "work",
+              "thread",
+              "turn"
+            ]
+          },
+          "selection": {
+            "type": "object",
+            "properties": {
+              "blockId": {
+                "$ref": "#/$defs/__schema0"
+              },
+              "field": {
+                "type": "string",
+                "enum": [
+                  "body",
+                  "text"
+                ]
+              },
+              "from": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "to": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "text": {
+                "type": "string",
+                "maxLength": 10000
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "text"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "ref",
+          "purpose",
+          "layer"
+        ],
+        "additionalProperties": false
+      },
+      "__schema2": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "project",
+              "chapter",
+              "episode",
+              "scene",
+              "resource",
+              "knowledge",
+              "shot",
+              "thread",
+              "work",
+              "job",
+              "artifact",
+              "cut",
+              "build",
+              "change",
+              "note",
+              "script"
+            ]
+          },
+          "id": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "seq": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "seq"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "WritingReceiptRequest": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "oneOf": [
+      {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "projectId": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "operation": {
+            "type": "string",
+            "const": "writing.start"
+          },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "owner": {
+                "$ref": "#/$defs/__schema0"
+              },
+              "message": {
+                "$ref": "#/$defs/__schema1"
+              },
+              "mode": {
+                "$ref": "#/$defs/__schema2"
+              },
+              "bindings": {
+                "$ref": "#/$defs/__schema3"
+              },
+              "targetRefs": {
+                "$ref": "#/$defs/__schema6"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 160
+              },
+              "goal": {
+                "default": "",
+                "type": "string",
+                "maxLength": 20000
+              }
+            },
+            "required": [
+              "owner",
+              "message",
+              "mode",
+              "bindings",
+              "targetRefs",
+              "title",
+              "goal"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "requestId",
+          "projectId",
+          "operation",
+          "payload"
+        ],
+        "additionalProperties": false
+      },
+      {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "projectId": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "operation": {
+            "type": "string",
+            "const": "writing.continue"
+          },
+          "payload": {
+            "type": "object",
+            "properties": {
+              "owner": {
+                "$ref": "#/$defs/__schema0"
+              },
+              "message": {
+                "$ref": "#/$defs/__schema1"
+              },
+              "mode": {
+                "$ref": "#/$defs/__schema2"
+              },
+              "bindings": {
+                "$ref": "#/$defs/__schema3"
+              },
+              "targetRefs": {
+                "$ref": "#/$defs/__schema6"
+              },
+              "threadId": {
+                "$ref": "#/$defs/__schema0"
+              },
+              "selection": {
+                "type": "object",
+                "properties": {
+                  "entryId": {
+                    "$ref": "#/$defs/__schema0"
+                  },
+                  "optionId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  }
+                },
+                "required": [
+                  "entryId",
+                  "optionId"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "owner",
+              "message",
+              "mode",
+              "bindings",
+              "targetRefs",
+              "threadId"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "requestId",
+          "projectId",
+          "operation",
+          "payload"
+        ],
+        "additionalProperties": false
+      }
+    ],
+    "$defs": {
+      "__schema0": {
+        "type": "string",
+        "format": "uuid",
+        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+      },
+      "__schema1": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 20000
+      },
+      "__schema2": {
+        "type": "string",
+        "enum": [
+          "discuss",
+          "draft",
+          "revise",
+          "review"
+        ]
+      },
+      "__schema3": {
+        "default": [],
+        "maxItems": 40,
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/__schema4"
+        }
+      },
+      "__schema4": {
+        "type": "object",
+        "properties": {
+          "ref": {
+            "$ref": "#/$defs/__schema5"
+          },
+          "purpose": {
+            "default": "参考",
+            "type": "string",
+            "maxLength": 200
+          },
+          "layer": {
+            "default": "turn",
+            "type": "string",
+            "enum": [
+              "project",
+              "work",
+              "thread",
+              "turn"
+            ]
+          },
+          "selection": {
+            "type": "object",
+            "properties": {
+              "blockId": {
+                "$ref": "#/$defs/__schema0"
+              },
+              "field": {
+                "type": "string",
+                "enum": [
+                  "body",
+                  "text"
+                ]
+              },
+              "from": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "to": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "text": {
+                "type": "string",
+                "maxLength": 10000
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "text"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "ref",
+          "purpose",
+          "layer"
+        ],
+        "additionalProperties": false
+      },
+      "__schema5": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "project",
+              "chapter",
+              "episode",
+              "scene",
+              "resource",
+              "knowledge",
+              "shot",
+              "thread",
+              "work",
+              "job",
+              "artifact",
+              "cut",
+              "build",
+              "change",
+              "note",
+              "script"
+            ]
+          },
+          "id": {
+            "$ref": "#/$defs/__schema0"
+          },
+          "seq": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "seq"
+        ],
+        "additionalProperties": false
+      },
+      "__schema6": {
+        "default": [],
+        "maxItems": 40,
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/__schema5"
+        }
+      }
+    }
+  },
+  "WritingStatusQuery": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "projectId": {
+        "$ref": "#/$defs/__schema0"
+      },
+      "threadId": {
+        "$ref": "#/$defs/__schema0"
+      },
+      "afterEntryId": {
+        "$ref": "#/$defs/__schema0"
+      }
+    },
+    "required": [
+      "projectId",
+      "threadId"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+      "__schema0": {
+        "type": "string",
+        "format": "uuid",
+        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+      }
+    }
+  },
+  "WritingOffer": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "question": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      },
+      "options": {
+        "minItems": 2,
+        "maxItems": 3,
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/__schema0"
+        }
+      }
+    },
+    "required": [
+      "question",
+      "options"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+      "__schema0": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "summary": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 5000
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "summary",
+          "message"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "WritingTurn": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "properties": {
+      "mode": {
+        "type": "string",
+        "enum": [
+          "discuss",
+          "draft",
+          "revise",
+          "review"
+        ]
+      },
+      "targetRefs": {
+        "maxItems": 40,
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/__schema0"
+        }
+      },
+      "selection": {
+        "type": "object",
+        "properties": {
+          "entryId": {
+            "$ref": "#/$defs/__schema1"
+          },
+          "optionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "required": [
+          "entryId",
+          "optionId"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "mode",
+      "targetRefs"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+      "__schema0": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "project",
+              "chapter",
+              "episode",
+              "scene",
+              "resource",
+              "knowledge",
+              "shot",
+              "thread",
+              "work",
+              "job",
+              "artifact",
+              "cut",
+              "build",
+              "change",
+              "note",
+              "script"
+            ]
+          },
+          "id": {
+            "$ref": "#/$defs/__schema1"
+          },
+          "seq": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "seq"
+        ],
+        "additionalProperties": false
+      },
+      "__schema1": {
+        "type": "string",
+        "format": "uuid",
+        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+      }
+    }
+  }
+}

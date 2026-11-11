@@ -1,0 +1,22 @@
+.context-references{margin:20px 0;border:1px solid var(--border);border-radius:10px;background:var(--panel);min-width:0}
+.context-references>summary{display:flex;align-items:center;gap:8px;cursor:pointer;padding:14px;list-style:none}
+.context-references>summary::-webkit-details-marker{display:none}
+.context-references>summary>svg{flex:none;transition:transform .15s}
+.context-references[open]>summary>svg{transform:rotate(90deg)}
+.context-references>summary>span{font-size:12px;color:var(--muted);margin-left:auto}
+.context-references-body{padding:0 14px 14px;min-width:0}
+.context-references-body>p{font-size:12px;line-height:1.6;margin:0 0 12px}
+.context-reference-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.context-reference-toolbar>input{flex:1;min-width:0}
+.context-reference-toolbar>button{flex:none}
+.context-reference-picker{border:0;padding:0;margin:0;min-width:0}
+.context-reference-picker .object-picker{margin:10px 0}
+.context-reference-list{list-style:none;padding:0;margin:0}
+.context-reference-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border);min-width:0}
+.context-reference-info{min-width:0;flex:1}
+.context-reference-info strong{display:block;font-size:13px;font-weight:500;overflow-wrap:anywhere;line-height:1.6}
+.context-reference-info small,.context-reference-info .error-text{display:block;font-size:11px;line-height:1.6;margin-top:4px;color:var(--muted);overflow-wrap:anywhere}
+.context-reference-info .error-text{color:#eaa69a}
+.context-reference-actions{display:flex;gap:6px;flex:none;align-items:center}
+.context-reference-actions>button{font-size:12px;min-height:34px}
+@container editor (max-width:440px){.context-references>summary{flex-wrap:wrap}.context-reference-toolbar{flex-wrap:wrap}.context-reference-toolbar>input{flex-basis:100%}.context-reference-row{flex-wrap:wrap;gap:8px}.context-reference-info{flex-basis:100%}.context-reference-actions{margin-left:auto}.context-reference-picker .picker-results button{align-items:flex-start;flex-direction:column;gap:4px}.context-reference-picker .picker-results button span{white-space:normal;overflow-wrap:anywhere}.context-reference-picker .picker-results small{white-space:normal;overflow-wrap:anywhere}}
