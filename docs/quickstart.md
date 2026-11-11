@@ -34,6 +34,20 @@ npm run start:local
 
 写作需准备自己的 Codex CLI / 登录，按 [平台写作](platform-writing.md) 使用；基础手工编辑无需登录。安装依赖或打开工作台不会自动生成。云端视频需用户自行启用并确认生成。
 
+## Linux 媒体与字体
+
+占位图、带字标题和中文字幕合成需要中文字体，以及包含 `drawtext` / `subtitles` 滤镜的 FFmpeg。不同平台下载的静态二进制功能可能不同。Ubuntu / Debian 的完整媒体工作流和 `npm run check` 使用：
+
+```sh
+sudo apt-get update
+sudo apt-get install --no-install-recommends ffmpeg fonts-noto-cjk
+export DREAMER_FFMPEG=/usr/bin/ffmpeg
+export DREAMER_FFPROBE=/usr/bin/ffprobe
+npm run check
+```
+
+在同一终端启动 Demo 或工作台；使用 `start:local` 时，也可把上述两个路径写入 `.env.local`。中文渲染自动使用 macOS 的 PingFang 或 Ubuntu / Debian 的 Noto Sans CJK；字体未安装时会提示安装，不会静默输出缺字画面。纯逻辑 Demo 不需要字体或媒体二进制。CI 在 Linux 安装同样的依赖；Windows 完整媒体工作流尚未验证。
+
 ## 启动问题
 
 | 现象 | 处理 |
@@ -44,6 +58,7 @@ npm run start:local
 | `.env.local` 没生效 | 用 `npm run start:local` 并重启；普通 start 不加载 dotenv |
 | FFmpeg 下载失败 | 指定可信本地 `DREAMER_FFMPEG` / `DREAMER_FFPROBE`；基础模拟无需媒体二进制 |
 | 已有二进制，跳过 FFmpeg 下载 | 安装时用 `FFMPEG_BIN=/absolute/path/to/ffmpeg npm ci`；运行仍需设置 `DREAMER_FFMPEG` |
+| 媒体提示缺少中文字体或 `No such filter: drawtext` | 按上方 Linux 配置安装字体与完整 FFmpeg，核对 `DREAMER_FFMPEG` |
 | `npm ci` 无网络 | 安装仍需 npm 包缓存或网络；“无 Key”不代表依赖已离线打包 |
 | Demo 点击 Agent 提示不可用 | 预期行为；用持久工作区并配置自己的账户 |
 | `h3:verify` 找不到下载证据 | 仍依赖原工程固定资产记录，尚非通用安装器 |

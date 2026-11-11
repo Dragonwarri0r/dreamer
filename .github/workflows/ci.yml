@@ -30,6 +30,12 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - name: Install Linux media dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install --no-install-recommends -y ffmpeg fonts-noto-cjk
+          printf '%s\n' 'DREAMER_FFMPEG=/usr/bin/ffmpeg' 'DREAMER_FFPROBE=/usr/bin/ffprobe' >> "$GITHUB_ENV"
       - run: npm ci --no-fund
       - run: npm run check
       - run: node --import tsx scripts/export-writing-skills.ts --check

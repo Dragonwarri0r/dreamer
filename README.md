@@ -33,7 +33,7 @@ npm run demo
 
 两种 Demo 默认使用同一端口，先按 `Ctrl+C` 关闭，再启动另一种。媒体 Demo 的画面是合成色块，不是 AI 生成样片。
 
-Demo 每次使用独立临时数据，忽略 `DREAMER_DATA_ROOT`，正常退出后清理；需要保留创作请使用下方的持久工作台。依赖安装需要网络，FFmpeg 安装脚本可能额外下载二进制。常见安装问题见 [快速开始](docs/quickstart.md)。
+Demo 每次使用独立临时数据，忽略 `DREAMER_DATA_ROOT`，正常退出后清理；需要保留创作请使用下方的持久工作台。依赖安装需要网络，FFmpeg 安装脚本可能额外下载二进制。Linux 完整媒体工作流和回归还需中文字体与完整 FFmpeg，安装命令见 [快速开始](docs/quickstart.md#linux-媒体与字体)。
 
 ## 本地 Codex / 其他 Agent 快速接入
 
