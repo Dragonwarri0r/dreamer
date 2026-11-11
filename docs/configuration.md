@@ -20,7 +20,7 @@
 
 MCP 示例脚本和 Node 路径须改为自己的绝对路径。适配器和 Host 默认端口现在均为 4327；既有 Host 若运行在 4330 等自定义端口，继续显式填写对应 `DREAMER_URL`。客户端需先启动 Host；连接到离线 Demo 不会启用真实写作。MCP 不自动读取 `.env.local`，启动参数应放在客户端的 env 配置里。
 
-中文媒体渲染使用系统字体：macOS PingFang 或 Ubuntu / Debian Noto Sans CJK；Linux 需要安装完整 FFmpeg 与字体，见 [安装说明](quickstart.md#linux-媒体与字体)。字体、FFmpeg 二进制均不随源码分发。
+中文媒体渲染使用系统字体：macOS 优先 PingFang，精简系统使用 Heiti；Ubuntu / Debian 使用 Noto Sans CJK。Linux 需要安装完整 FFmpeg 与字体，见 [安装说明](quickstart.md#linux-媒体与字体)。字体、FFmpeg 二进制均不随源码分发。
 
 ## Key 保存位置
 

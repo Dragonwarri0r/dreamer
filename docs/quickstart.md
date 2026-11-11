@@ -46,7 +46,7 @@ export DREAMER_FFPROBE=/usr/bin/ffprobe
 npm run check
 ```
 
-在同一终端启动 Demo 或工作台；使用 `start:local` 时，也可把上述两个路径写入 `.env.local`。中文渲染自动使用 macOS 的 PingFang 或 Ubuntu / Debian 的 Noto Sans CJK；字体未安装时会提示安装，不会静默输出缺字画面。纯逻辑 Demo 不需要字体或媒体二进制。CI 在 Linux 安装同样的依赖；Windows 完整媒体工作流尚未验证。
+在同一终端启动 Demo 或工作台；使用 `start:local` 时，也可把上述两个路径写入 `.env.local`。中文渲染自动使用 macOS 的 PingFang（精简系统使用 Heiti）或 Ubuntu / Debian 的 Noto Sans CJK；字体未安装时会提示安装，不会静默输出缺字画面。纯逻辑 Demo 不需要字体或媒体二进制。CI 在 Linux 安装同样的依赖；Windows 完整媒体工作流尚未验证。
 
 ## 启动问题
 
