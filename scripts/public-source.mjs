@@ -2,6 +2,7 @@ import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, realpathSy
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 const root=realpathSync(resolve(dirname(fileURLToPath(import.meta.url)),'..'));
 const manifest=JSON.parse(readFileSync(join(root,'config/public-source.json'),'utf8'));
@@ -41,6 +42,12 @@ const patterns=[
  ['credential URL',/https?:\/\/[^\s/@:"'<>]+:[^\s/@"'<>]+@[^\s/"'<>]+/g],
 ];
 function scan(path,bytes,label=path){
+ // Screenshots need visual review: only the exact reviewed PNG bytes may pass.
+ const reviewedImage=manifest.reviewedImages?.[path];
+ if(reviewedImage){
+  if(!path.startsWith('docs/images/')||!path.endsWith('.png')||!bytes.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex'))||createHash('sha256').update(bytes).digest('hex')!==reviewedImage)fail(label,'reviewed image content changed or invalid');
+  return;
+ }
  const text=bytes.toString('utf8');
  if(bytes.includes(0)){fail(label,'binary source requires explicit review');return;}
  for(const [rule,pattern] of patterns){

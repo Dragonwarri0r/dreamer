@@ -13,6 +13,10 @@ Dreamer 是面向作者的创作工作台：章节、剧本、设定、分镜、
 
 当前为早期版本，已验证 macOS 上的工作台与两种 Demo。H3 / LTX Worker 属于实验功能，需要独立配置环境与模型。项目采用 [Apache-2.0](LICENSE)，第三方来源与许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
 
+![Dreamer 互动剧本工作台：左侧故事线与节点，右侧编辑观众选择和后续节点](docs/images/story-editor.png)
+
+*互动剧本编排：在同一工程中安排故事片段、观众输入、分支和结局。画面使用内置“城门选择”样例。*
+
 ## 快速体验：无需 Key
 
 准备 **Node.js 24.14–24.x** 和 npm；使用 nvm 的开发者可在仓库目录运行 `nvm use`。
@@ -34,6 +38,21 @@ npm run demo
 两种 Demo 默认使用同一端口，先按 `Ctrl+C` 关闭，再启动另一种。媒体 Demo 的画面是合成色块，不是 AI 生成样片。
 
 Demo 每次使用独立临时数据，忽略 `DREAMER_DATA_ROOT`，正常退出后清理；需要保留创作请使用下方的持久工作台。依赖安装需要网络，FFmpeg 安装脚本可能额外下载二进制。Linux 完整媒体工作流和回归还需中文字体与完整 FFmpeg，安装命令见 [快速开始](docs/quickstart.md#linux-媒体与字体)。
+
+<details>
+<summary>查看两种 Demo 的界面截图</summary>
+
+**逻辑模拟**：选择行动，手动结束片段，检查故事如何进入后续路线。
+
+![无 Key 逻辑模拟：城门故事中的三个选择与“模拟片段结束”按钮](docs/images/demo-simulation.png)
+
+**互动播放**：在视频播放期间选择行动；下图的本地 FFmpeg 色块视频用于演示播放与选择的时序。
+
+![互动视频 Demo：本地色块视频、播放控制和观众选择并排显示](docs/images/demo-media.png)
+
+截图来自隔离的内置样例，不含个人工程或账户配置。[截图来源与更新说明](docs/images/README.md)。
+
+</details>
 
 ## 本地 Codex / 其他 Agent 快速接入
 

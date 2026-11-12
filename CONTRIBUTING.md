@@ -14,4 +14,6 @@ Host 与 Studio 同仓；日常入口为 `npm start`，前端修改后 `npm run 
 
 提交前和暂存后均运行 `npm run source:check`。新增公开文件应更新白名单；不要强制加入本地凭据或个人作品。GitHub Actions 在 Linux / macOS 执行工程检查，并扫描 Git 历史中的疑似密钥；CI 不调用真实模型或付费 Provider。
 
+README 图片只接受人工复核的 `docs/images/` PNG，并在公开清单的 `reviewedImages` 中记录精确 SHA-256。更新图片后重新检查隐私和元数据，再更新哈希；检查器会拒绝内容被替换的图片，包括暂存区残留版本。见 [截图维护说明](docs/images/README.md)。
+
 通过 [Issues](https://github.com/Dragonwarri0r/dreamer/issues) 报告可复现问题或讨论较大改动。安全问题按 [SECURITY.md](SECURITY.md) 处理，不公开敏感细节。

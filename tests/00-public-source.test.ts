@@ -4,6 +4,7 @@ import {copyFileSync,mkdirSync,mkdtempSync,readFileSync,rmSync,symlinkSync,write
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import test from 'node:test';
+import {createHash} from 'node:crypto';
 
 const repo=resolve(import.meta.dirname,'..');
 // Construct an invalid synthetic marker; never use personal credentials in these tests.
@@ -84,4 +85,27 @@ test('00 local config, key variants and backup paths are ignored without hiding 
  const publicPaths=['.env.example','.gitignore','README.md','package.json','package-lock.json','apps/host/main.ts','config/examples/dreamer-writing.mcp.json','config/examples/dreamer-writing.codex.toml'];
  const publicResult=spawnSync('git',['check-ignore','--no-index','--stdin','-z'],{cwd:root,encoding:'utf8',input:publicPaths.join('\0')+'\0'});
  assert.equal(publicResult.status,1);assert.equal(publicResult.stdout,'');
+}));
+
+test('00 only exact reviewed PNGs pass; unreviewed files and stale index bytes still block publication',()=>fixture(root=>{
+ const path='docs/images/demo.png',full=join(root,path),config=join(root,'config/public-source.json');
+ mkdirSync(join(root,'docs/images'),{recursive:true});
+ const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/lGQAAAAASUVORK5CYII=','base64');
+ const manifest=JSON.parse(readFileSync(config,'utf8'));manifest.include.push('docs/images');
+ manifest.reviewedImages={[path]:createHash('sha256').update(png).digest('hex')};
+ writeFileSync(config,JSON.stringify(manifest));writeFileSync(full,png);
+ assert.equal(check(root).status,0);
+ const exportRoot=mkdtempSync(join(tmpdir(),'dreamer-image-export-')),exportDir=join(exportRoot,'public-copy');
+ try{
+  execFileSync(process.execPath,['scripts/public-source.mjs','--output',exportDir],{cwd:root});
+  assert.deepEqual(readFileSync(join(exportDir,path)),png);
+ }finally{rmSync(exportRoot,{recursive:true,force:true});}
+ writeFileSync(join(root,'docs/images/other.png'),png);
+ assert.ok(check(root).report.findings.some(f=>f.path==='docs/images/other.png'&&f.rule==='binary source requires explicit review'));
+ rmSync(join(root,'docs/images/other.png'));
+ writeFileSync(full,Buffer.concat([png,Buffer.from(marker)]));
+ assert.ok(check(root).report.findings.some(f=>f.path===path&&f.rule==='reviewed image content changed or invalid'));
+ execFileSync('git',['add','--',path],{cwd:root});writeFileSync(full,png);
+ const staged=check(root);assert.equal(staged.status,1);
+ assert.ok(staged.report.findings.some(f=>f.path===path+' (index)'&&f.rule==='reviewed image content changed or invalid'));
 }));

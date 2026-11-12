@@ -76,6 +76,15 @@
     "NOTICE",
     "docs/licenses",
     ".github/workflows/ci.yml",
-    ".gitleaks.toml"
-  ]
+    ".gitleaks.toml",
+    "docs/images/README.md",
+    "docs/images/demo-media.png",
+    "docs/images/demo-simulation.png",
+    "docs/images/story-editor.png"
+  ],
+  "reviewedImages": {
+    "docs/images/demo-media.png": "49c26bb9af07593b7f999121524e8cc5de4315ba41cdee60f00d19d3185d65e9",
+    "docs/images/demo-simulation.png": "79183468ef401247ee28e9a957ebfc5d60f04aeb291ee220945d1716f93aa8cd",
+    "docs/images/story-editor.png": "143354dbc9551ca68743eb9c7b8adc156091be317b07caaedbe34d98263fbf79"
+  }
 }
